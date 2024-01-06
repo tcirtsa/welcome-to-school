@@ -1,2 +1,3 @@
 # welcome-to-school
-a system for green student
+
+system for green student
