@@ -1,0 +1,10 @@
+D:\welcome to school\welcome-to-school\rust_item\target\debug\deps\libfutures_channel-c4e8cb8cbea31f6f.rmeta: C:\Users\tcirt\.cargo\registry\src\rsproxy.cn-8f6827c7555bfaf8\futures-channel-0.3.30\src\lib.rs C:\Users\tcirt\.cargo\registry\src\rsproxy.cn-8f6827c7555bfaf8\futures-channel-0.3.30\src\lock.rs C:\Users\tcirt\.cargo\registry\src\rsproxy.cn-8f6827c7555bfaf8\futures-channel-0.3.30\src\mpsc\mod.rs C:\Users\tcirt\.cargo\registry\src\rsproxy.cn-8f6827c7555bfaf8\futures-channel-0.3.30\src\mpsc\queue.rs C:\Users\tcirt\.cargo\registry\src\rsproxy.cn-8f6827c7555bfaf8\futures-channel-0.3.30\src\mpsc\sink_impl.rs C:\Users\tcirt\.cargo\registry\src\rsproxy.cn-8f6827c7555bfaf8\futures-channel-0.3.30\src\oneshot.rs
+
+D:\welcome to school\welcome-to-school\rust_item\target\debug\deps\futures_channel-c4e8cb8cbea31f6f.d: C:\Users\tcirt\.cargo\registry\src\rsproxy.cn-8f6827c7555bfaf8\futures-channel-0.3.30\src\lib.rs C:\Users\tcirt\.cargo\registry\src\rsproxy.cn-8f6827c7555bfaf8\futures-channel-0.3.30\src\lock.rs C:\Users\tcirt\.cargo\registry\src\rsproxy.cn-8f6827c7555bfaf8\futures-channel-0.3.30\src\mpsc\mod.rs C:\Users\tcirt\.cargo\registry\src\rsproxy.cn-8f6827c7555bfaf8\futures-channel-0.3.30\src\mpsc\queue.rs C:\Users\tcirt\.cargo\registry\src\rsproxy.cn-8f6827c7555bfaf8\futures-channel-0.3.30\src\mpsc\sink_impl.rs C:\Users\tcirt\.cargo\registry\src\rsproxy.cn-8f6827c7555bfaf8\futures-channel-0.3.30\src\oneshot.rs
+
+C:\Users\tcirt\.cargo\registry\src\rsproxy.cn-8f6827c7555bfaf8\futures-channel-0.3.30\src\lib.rs:
+C:\Users\tcirt\.cargo\registry\src\rsproxy.cn-8f6827c7555bfaf8\futures-channel-0.3.30\src\lock.rs:
+C:\Users\tcirt\.cargo\registry\src\rsproxy.cn-8f6827c7555bfaf8\futures-channel-0.3.30\src\mpsc\mod.rs:
+C:\Users\tcirt\.cargo\registry\src\rsproxy.cn-8f6827c7555bfaf8\futures-channel-0.3.30\src\mpsc\queue.rs:
+C:\Users\tcirt\.cargo\registry\src\rsproxy.cn-8f6827c7555bfaf8\futures-channel-0.3.30\src\mpsc\sink_impl.rs:
+C:\Users\tcirt\.cargo\registry\src\rsproxy.cn-8f6827c7555bfaf8\futures-channel-0.3.30\src\oneshot.rs:

@@ -1,0 +1,12 @@
+D:\welcome to school\welcome-to-school\rust_item\target\debug\deps\async_trait-2af9d17286d3e88b.dll: C:\Users\tcirt\.cargo\registry\src\rsproxy.cn-8f6827c7555bfaf8\async-trait-0.1.77\src\lib.rs C:\Users\tcirt\.cargo\registry\src\rsproxy.cn-8f6827c7555bfaf8\async-trait-0.1.77\src\args.rs C:\Users\tcirt\.cargo\registry\src\rsproxy.cn-8f6827c7555bfaf8\async-trait-0.1.77\src\bound.rs C:\Users\tcirt\.cargo\registry\src\rsproxy.cn-8f6827c7555bfaf8\async-trait-0.1.77\src\expand.rs C:\Users\tcirt\.cargo\registry\src\rsproxy.cn-8f6827c7555bfaf8\async-trait-0.1.77\src\lifetime.rs C:\Users\tcirt\.cargo\registry\src\rsproxy.cn-8f6827c7555bfaf8\async-trait-0.1.77\src\parse.rs C:\Users\tcirt\.cargo\registry\src\rsproxy.cn-8f6827c7555bfaf8\async-trait-0.1.77\src\receiver.rs C:\Users\tcirt\.cargo\registry\src\rsproxy.cn-8f6827c7555bfaf8\async-trait-0.1.77\src\verbatim.rs
+
+D:\welcome to school\welcome-to-school\rust_item\target\debug\deps\async_trait-2af9d17286d3e88b.d: C:\Users\tcirt\.cargo\registry\src\rsproxy.cn-8f6827c7555bfaf8\async-trait-0.1.77\src\lib.rs C:\Users\tcirt\.cargo\registry\src\rsproxy.cn-8f6827c7555bfaf8\async-trait-0.1.77\src\args.rs C:\Users\tcirt\.cargo\registry\src\rsproxy.cn-8f6827c7555bfaf8\async-trait-0.1.77\src\bound.rs C:\Users\tcirt\.cargo\registry\src\rsproxy.cn-8f6827c7555bfaf8\async-trait-0.1.77\src\expand.rs C:\Users\tcirt\.cargo\registry\src\rsproxy.cn-8f6827c7555bfaf8\async-trait-0.1.77\src\lifetime.rs C:\Users\tcirt\.cargo\registry\src\rsproxy.cn-8f6827c7555bfaf8\async-trait-0.1.77\src\parse.rs C:\Users\tcirt\.cargo\registry\src\rsproxy.cn-8f6827c7555bfaf8\async-trait-0.1.77\src\receiver.rs C:\Users\tcirt\.cargo\registry\src\rsproxy.cn-8f6827c7555bfaf8\async-trait-0.1.77\src\verbatim.rs
+
+C:\Users\tcirt\.cargo\registry\src\rsproxy.cn-8f6827c7555bfaf8\async-trait-0.1.77\src\lib.rs:
+C:\Users\tcirt\.cargo\registry\src\rsproxy.cn-8f6827c7555bfaf8\async-trait-0.1.77\src\args.rs:
+C:\Users\tcirt\.cargo\registry\src\rsproxy.cn-8f6827c7555bfaf8\async-trait-0.1.77\src\bound.rs:
+C:\Users\tcirt\.cargo\registry\src\rsproxy.cn-8f6827c7555bfaf8\async-trait-0.1.77\src\expand.rs:
+C:\Users\tcirt\.cargo\registry\src\rsproxy.cn-8f6827c7555bfaf8\async-trait-0.1.77\src\lifetime.rs:
+C:\Users\tcirt\.cargo\registry\src\rsproxy.cn-8f6827c7555bfaf8\async-trait-0.1.77\src\parse.rs:
+C:\Users\tcirt\.cargo\registry\src\rsproxy.cn-8f6827c7555bfaf8\async-trait-0.1.77\src\receiver.rs:
+C:\Users\tcirt\.cargo\registry\src\rsproxy.cn-8f6827c7555bfaf8\async-trait-0.1.77\src\verbatim.rs:

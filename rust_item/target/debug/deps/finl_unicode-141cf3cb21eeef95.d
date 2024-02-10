@@ -1,0 +1,10 @@
+D:\welcome to school\welcome-to-school\rust_item\target\debug\deps\libfinl_unicode-141cf3cb21eeef95.rmeta: C:\Users\tcirt\.cargo\registry\src\rsproxy.cn-8f6827c7555bfaf8\finl_unicode-1.2.0\src\lib.rs C:\Users\tcirt\.cargo\registry\src\rsproxy.cn-8f6827c7555bfaf8\finl_unicode-1.2.0\src\categories.rs C:\Users\tcirt\.cargo\registry\src\rsproxy.cn-8f6827c7555bfaf8\finl_unicode-1.2.0\src\grapheme_clusters.rs C:\Users\tcirt\.cargo\registry\src\rsproxy.cn-8f6827c7555bfaf8\finl_unicode-1.2.0\src\data\mod.rs C:\Users\tcirt\.cargo\registry\src\rsproxy.cn-8f6827c7555bfaf8\finl_unicode-1.2.0\src\data\characters.rs C:\Users\tcirt\.cargo\registry\src\rsproxy.cn-8f6827c7555bfaf8\finl_unicode-1.2.0\src\data\grapheme_property.rs
+
+D:\welcome to school\welcome-to-school\rust_item\target\debug\deps\finl_unicode-141cf3cb21eeef95.d: C:\Users\tcirt\.cargo\registry\src\rsproxy.cn-8f6827c7555bfaf8\finl_unicode-1.2.0\src\lib.rs C:\Users\tcirt\.cargo\registry\src\rsproxy.cn-8f6827c7555bfaf8\finl_unicode-1.2.0\src\categories.rs C:\Users\tcirt\.cargo\registry\src\rsproxy.cn-8f6827c7555bfaf8\finl_unicode-1.2.0\src\grapheme_clusters.rs C:\Users\tcirt\.cargo\registry\src\rsproxy.cn-8f6827c7555bfaf8\finl_unicode-1.2.0\src\data\mod.rs C:\Users\tcirt\.cargo\registry\src\rsproxy.cn-8f6827c7555bfaf8\finl_unicode-1.2.0\src\data\characters.rs C:\Users\tcirt\.cargo\registry\src\rsproxy.cn-8f6827c7555bfaf8\finl_unicode-1.2.0\src\data\grapheme_property.rs
+
+C:\Users\tcirt\.cargo\registry\src\rsproxy.cn-8f6827c7555bfaf8\finl_unicode-1.2.0\src\lib.rs:
+C:\Users\tcirt\.cargo\registry\src\rsproxy.cn-8f6827c7555bfaf8\finl_unicode-1.2.0\src\categories.rs:
+C:\Users\tcirt\.cargo\registry\src\rsproxy.cn-8f6827c7555bfaf8\finl_unicode-1.2.0\src\grapheme_clusters.rs:
+C:\Users\tcirt\.cargo\registry\src\rsproxy.cn-8f6827c7555bfaf8\finl_unicode-1.2.0\src\data\mod.rs:
+C:\Users\tcirt\.cargo\registry\src\rsproxy.cn-8f6827c7555bfaf8\finl_unicode-1.2.0\src\data\characters.rs:
+C:\Users\tcirt\.cargo\registry\src\rsproxy.cn-8f6827c7555bfaf8\finl_unicode-1.2.0\src\data\grapheme_property.rs:

@@ -1,0 +1,12 @@
+D:\welcome to school\welcome-to-school\rust_item\target\debug\deps\libdigest-c177b90fac6ebcfd.rmeta: C:\Users\tcirt\.cargo\registry\src\rsproxy.cn-8f6827c7555bfaf8\digest-0.10.7\src\lib.rs C:\Users\tcirt\.cargo\registry\src\rsproxy.cn-8f6827c7555bfaf8\digest-0.10.7\src\core_api.rs C:\Users\tcirt\.cargo\registry\src\rsproxy.cn-8f6827c7555bfaf8\digest-0.10.7\src\core_api\ct_variable.rs C:\Users\tcirt\.cargo\registry\src\rsproxy.cn-8f6827c7555bfaf8\digest-0.10.7\src\core_api\rt_variable.rs C:\Users\tcirt\.cargo\registry\src\rsproxy.cn-8f6827c7555bfaf8\digest-0.10.7\src\core_api\wrapper.rs C:\Users\tcirt\.cargo\registry\src\rsproxy.cn-8f6827c7555bfaf8\digest-0.10.7\src\core_api\xof_reader.rs C:\Users\tcirt\.cargo\registry\src\rsproxy.cn-8f6827c7555bfaf8\digest-0.10.7\src\digest.rs C:\Users\tcirt\.cargo\registry\src\rsproxy.cn-8f6827c7555bfaf8\digest-0.10.7\src\mac.rs
+
+D:\welcome to school\welcome-to-school\rust_item\target\debug\deps\digest-c177b90fac6ebcfd.d: C:\Users\tcirt\.cargo\registry\src\rsproxy.cn-8f6827c7555bfaf8\digest-0.10.7\src\lib.rs C:\Users\tcirt\.cargo\registry\src\rsproxy.cn-8f6827c7555bfaf8\digest-0.10.7\src\core_api.rs C:\Users\tcirt\.cargo\registry\src\rsproxy.cn-8f6827c7555bfaf8\digest-0.10.7\src\core_api\ct_variable.rs C:\Users\tcirt\.cargo\registry\src\rsproxy.cn-8f6827c7555bfaf8\digest-0.10.7\src\core_api\rt_variable.rs C:\Users\tcirt\.cargo\registry\src\rsproxy.cn-8f6827c7555bfaf8\digest-0.10.7\src\core_api\wrapper.rs C:\Users\tcirt\.cargo\registry\src\rsproxy.cn-8f6827c7555bfaf8\digest-0.10.7\src\core_api\xof_reader.rs C:\Users\tcirt\.cargo\registry\src\rsproxy.cn-8f6827c7555bfaf8\digest-0.10.7\src\digest.rs C:\Users\tcirt\.cargo\registry\src\rsproxy.cn-8f6827c7555bfaf8\digest-0.10.7\src\mac.rs
+
+C:\Users\tcirt\.cargo\registry\src\rsproxy.cn-8f6827c7555bfaf8\digest-0.10.7\src\lib.rs:
+C:\Users\tcirt\.cargo\registry\src\rsproxy.cn-8f6827c7555bfaf8\digest-0.10.7\src\core_api.rs:
+C:\Users\tcirt\.cargo\registry\src\rsproxy.cn-8f6827c7555bfaf8\digest-0.10.7\src\core_api\ct_variable.rs:
+C:\Users\tcirt\.cargo\registry\src\rsproxy.cn-8f6827c7555bfaf8\digest-0.10.7\src\core_api\rt_variable.rs:
+C:\Users\tcirt\.cargo\registry\src\rsproxy.cn-8f6827c7555bfaf8\digest-0.10.7\src\core_api\wrapper.rs:
+C:\Users\tcirt\.cargo\registry\src\rsproxy.cn-8f6827c7555bfaf8\digest-0.10.7\src\core_api\xof_reader.rs:
+C:\Users\tcirt\.cargo\registry\src\rsproxy.cn-8f6827c7555bfaf8\digest-0.10.7\src\digest.rs:
+C:\Users\tcirt\.cargo\registry\src\rsproxy.cn-8f6827c7555bfaf8\digest-0.10.7\src\mac.rs:
