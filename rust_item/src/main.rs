@@ -55,8 +55,8 @@ async fn upload_image(mut payload: Multipart) -> Result<HttpResponse, Error> {
         //std::thread::sleep(std::time::Duration::from_millis(5000));
         //std::fs::remove_file("D:\\Python\\t1\\pythonProject\\img\\1.person.1.jpg");
     }
-    let h = check_image().unwrap();
-    Ok(HttpResponse::Ok().body(h))
+    //let h = check_image().unwrap();
+    Ok(HttpResponse::Ok().body("Ok"))
 }
 
 #[post["/account"]]
