@@ -1,7 +1,8 @@
 use actix_multipart::Multipart;
 use actix_web::{post, web, App, Error, HttpResponse, HttpServer, Responder};
 use futures::{StreamExt, TryStreamExt};
-use opencv::{core, face, imgcodecs, prelude::*};
+use opencv::core::{FileNode, FileStorage, FileStorage_Mode, Mat};
+use opencv::{core, face, imgcodecs, imgproc, objdetect, prelude::*, types};
 use serde::Deserialize;
 use std::fs::File;
 use std::io::Write;
@@ -14,26 +15,55 @@ pub struct Account {
 }
 
 fn check_image() -> Result<String, Box<dyn std::error::Error>> {
-    let xml = "../face_model.xml";
-    // 加载训练好的模型
+    let mut label = -1;
+    let mut confidence = 0.0;
+    // 初始化人脸检测器
+    let mut face_detector =
+        objdetect::CascadeClassifier::new("../haarcascade_frontalface_default.xml")?;
+
+    // 初始化LBPH人脸识别器，并加载训练好的模型
     let mut recognizer = face::LBPHFaceRecognizer::create(1, 8, 8, 8, 123.0)?;
-    let filestorage = core::FileStorage::new(xml, 0, "utf-8")?;
-    let filenode = core::FileNode::new(&filestorage, 0, 0)?;
-    opencv::prelude::AlgorithmTrait::read(&mut recognizer, &filenode)?;
+    let fs = FileStorage::new("../face_model.xml", 0,"")?;
+    let fs_node = fs.get_first_top_level_node()?;
+    opencv::prelude::AlgorithmTrait::read(&mut recognizer,&fs_node)?;
 
-    // 加载要预测的图像
-    let image = imgcodecs::imread("./person.jpg", imgcodecs::IMREAD_GRAYSCALE)?;
+    // 读取图像文件
+    let img = imgcodecs::imread("./person.jpg", imgcodecs::IMREAD_COLOR)?;
 
-    let mut label = 0;
-    let mut confidence: f64 = 50.0;
-    // 使用模型预测图像的标签和置信度
-    let _ = recognizer.predict(&image, &mut label, &mut confidence)?;
+    // 转换为灰度图，人脸检测需要灰度图像
+    let mut gray = Mat::default();
+    imgproc::cvt_color(&img, &mut gray, 6, 0)?;
 
-    // 打印结果
-    Ok(format!(
-        "Predicted label: {}, confidence: {}",
-        label, confidence
-    ))
+    // 检测图像中的人脸
+    let mut faces = types::VectorOfRect::new();
+    face_detector.detect_multi_scale(
+        &gray,
+        &mut faces,
+        1.1,
+        10,
+        objdetect::CASCADE_SCALE_IMAGE,
+        core::Size::new(30, 30),
+        core::Size::default(),
+    )?;
+
+    // 确认是否检测到人脸
+    if !faces.is_empty() {
+        // 检测到人脸，取第一个人脸进行识别
+        let face = faces.get(0)?;
+        let face_roi = Mat::roi(&gray, face)?;
+
+        // 识别人脸
+        recognizer.predict(&face_roi, &mut label, &mut confidence)?;
+
+        // 根据识别结果输出标签或状态
+        if label != -1 {
+            Ok(format!("{}", label))
+        } else {
+            Ok(format!("Face not recognized"))
+        }
+    } else {
+        Ok(format!("No faces found"))
+    }
 }
 
 #[post("/upload_image")]
@@ -55,8 +85,8 @@ async fn upload_image(mut payload: Multipart) -> Result<HttpResponse, Error> {
         //std::thread::sleep(std::time::Duration::from_millis(5000));
         //std::fs::remove_file("D:\\Python\\t1\\pythonProject\\img\\1.person.1.jpg");
     }
-    //let h = check_image().unwrap();
-    Ok(HttpResponse::Ok().body("Ok"))
+    let h = check_image().unwrap();
+    Ok(HttpResponse::Ok().body(h))
 }
 
 #[post["/account"]]
