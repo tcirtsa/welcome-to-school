@@ -78,9 +78,6 @@ async fn upload_image(mut payload: Multipart) -> Result<HttpResponse, Error> {
             let data = chunk.unwrap();
             f.write_all(&data).unwrap();
         }
-
-        //等待加上调用python人脸识别的代码。。。。。。
-
         //最后再把照片删掉
         //std::thread::sleep(std::time::Duration::from_millis(5000));
         //std::fs::remove_file("D:\\Python\\t1\\pythonProject\\img\\1.person.1.jpg");
