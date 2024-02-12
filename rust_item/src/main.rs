@@ -1,7 +1,7 @@
 use actix_multipart::Multipart;
 use actix_web::{post, web, App, Error, HttpResponse, HttpServer, Responder};
 use futures::{StreamExt, TryStreamExt};
-use opencv::core::{FileNode, FileStorage, FileStorage_Mode, Mat};
+use opencv::core::{FileStorage, Mat};
 use opencv::{core, face, imgcodecs, imgproc, objdetect, prelude::*, types};
 use serde::Deserialize;
 use std::fs::File;
