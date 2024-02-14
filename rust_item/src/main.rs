@@ -1,19 +1,34 @@
+mod schema;
 use actix_multipart::Multipart;
 use actix_web::{post, web, App, Error, HttpResponse, HttpServer, Responder};
+use diesel::pg::PgConnection;
+use diesel::prelude::*;
+use diesel::r2d2;
+use dotenv::dotenv;
 use futures::{StreamExt, TryStreamExt};
 use opencv::core::{FileStorage, Mat};
 use opencv::{core, face, imgcodecs, imgproc, objdetect, prelude::*, types};
+use r2d2::{ConnectionManager, Pool};
+use schema::student::dsl::*;
 use serde::Deserialize;
+use std::env;
 use std::fs::File;
 use std::io::Write;
-use tokio_postgres::NoTls;
+
+// 连接池类型别名
+pub type DbPool = Pool<ConnectionManager<PgConnection>>;
 
 #[derive(Deserialize)]
 pub struct Account {
     account: String,
     psd: String,
 }
-
+#[derive(Queryable)]
+pub struct Student {
+    pub id: i32,
+    pub account: String,
+    pub psd: String, // 注意：实际生产中应使用哈希密码
+}
 fn check_image() -> Result<String, Box<dyn std::error::Error>> {
     let mut label = -1;
     let mut confidence = 0.0;
@@ -23,9 +38,9 @@ fn check_image() -> Result<String, Box<dyn std::error::Error>> {
 
     // 初始化LBPH人脸识别器，并加载训练好的模型
     let mut recognizer = face::LBPHFaceRecognizer::create(1, 8, 8, 8, 123.0)?;
-    let fs = FileStorage::new("../face_model.xml", 0,"")?;
+    let fs = FileStorage::new("../face_model.xml", 0, "")?;
     let fs_node = fs.get_first_top_level_node()?;
-    opencv::prelude::AlgorithmTrait::read(&mut recognizer,&fs_node)?;
+    opencv::prelude::AlgorithmTrait::read(&mut recognizer, &fs_node)?;
 
     // 读取图像文件
     let img = imgcodecs::imread("./person.jpg", imgcodecs::IMREAD_COLOR)?;
@@ -87,33 +102,45 @@ async fn upload_image(mut payload: Multipart) -> Result<HttpResponse, Error> {
 }
 
 #[post["/account"]]
-async fn check_account(a: web::Json<Account>) -> impl Responder {
-    let (client, connection) =
-        tokio_postgres::connect("postgresql://postgres:ppuqrwquqwe123@localhost/test", NoTls)
-            .await
-            .unwrap();
-    tokio::spawn(async move {
-        if let Err(e) = connection.await {
-            eprintln!("connection error: {}", e);
-        }
-    });
+async fn check_account(a: web::Json<Account>, pool: web::Data<DbPool>) -> impl Responder {
+    let mut conn = pool.get().expect("couldn't get db connection from pool");
+    // 查询数据库，检查用户名和密码
+    let results: Student = student
+        .filter(account.eq(&a.account))
+        .first::<Student>(&mut conn)
+        .expect("Error loading users");
 
-    let stmt = client
-        .prepare("SELECT * FROM student WHERE account = $1 and psd = $2")
-        .await
-        .unwrap();
-    let rows = client.query(&stmt, &[&a.account, &a.psd]).await.unwrap();
-
-    match rows.len() {
-        0 => HttpResponse::Ok().body("Invalid username/password"),
-        _ => HttpResponse::Ok().body("Login successful"),
+    // 根据查询结果返回相应信息
+    if results.psd == a.psd {
+        return HttpResponse::Ok().body("Password correct");
+    } else {
+        return HttpResponse::BadRequest().body("Invalid password");
     }
 }
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
-    HttpServer::new(|| App::new().service(upload_image).service(check_account))
-        .bind("127.0.0.1:8080")?
-        .run()
-        .await
+    // 载入.env文件中的环境变量
+    dotenv().ok();
+
+    // 从环境变量获取数据库的连接字符串
+    let database_url = env::var("DATABASE_URL").expect("DATABASE_URL must be set");
+
+    // 创建一个连接管理器
+    let manager = ConnectionManager::<PgConnection>::new(&database_url);
+
+    // 创建连接池
+    let pool: DbPool = Pool::builder()
+        .build(manager)
+        .expect("Failed to create pool.");
+
+    HttpServer::new(move || {
+        App::new()
+            .app_data(web::Data::new(pool.clone()))
+            .service(upload_image)
+            .service(check_account)
+    })
+    .bind("127.0.0.1:8080")?
+    .run()
+    .await
 }
