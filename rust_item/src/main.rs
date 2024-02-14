@@ -1,3 +1,4 @@
+mod model;
 mod schema;
 use actix_multipart::Multipart;
 use actix_web::{post, web, App, Error, HttpResponse, HttpServer, Responder};
@@ -6,6 +7,7 @@ use diesel::prelude::*;
 use diesel::r2d2;
 use dotenv::dotenv;
 use futures::{StreamExt, TryStreamExt};
+use model::*;
 use opencv::core::{FileStorage, Mat};
 use opencv::{core, face, imgcodecs, imgproc, objdetect, prelude::*, types};
 use r2d2::{ConnectionManager, Pool};
@@ -22,12 +24,6 @@ pub type DbPool = Pool<ConnectionManager<PgConnection>>;
 pub struct Account {
     account: String,
     psd: String,
-}
-#[derive(Queryable)]
-pub struct Student {
-    pub id: i32,
-    pub account: String,
-    pub psd: String, // 注意：实际生产中应使用哈希密码
 }
 fn check_image() -> Result<String, Box<dyn std::error::Error>> {
     let mut label = -1;
@@ -100,6 +96,22 @@ async fn upload_image(mut payload: Multipart) -> Result<HttpResponse, Error> {
     let h = check_image().unwrap();
     Ok(HttpResponse::Ok().body(h))
 }
+#[post("/update_psd")]
+async fn update_psd(a: web::Json<Account>, pool: web::Data<DbPool>) -> impl Responder {
+    let mut conn = pool.get().expect("couldn't get db connection from pool");
+    let result = web::block(move || {
+        diesel::update(student.filter(account.eq(&a.account)))
+            .set(psd.eq(&a.psd))
+            .execute(&mut conn)
+    })
+    .await;
+
+    match result.unwrap() {
+        Ok(0) => HttpResponse::NotFound().finish(),
+        Ok(_) => HttpResponse::Ok().body("Updated successfully"),
+        Err(_) => HttpResponse::InternalServerError().finish(),
+    }
+}
 
 #[post["/account"]]
 async fn check_account(a: web::Json<Account>, pool: web::Data<DbPool>) -> impl Responder {
@@ -139,6 +151,7 @@ async fn main() -> std::io::Result<()> {
             .app_data(web::Data::new(pool.clone()))
             .service(upload_image)
             .service(check_account)
+            .service(update_psd)
     })
     .bind("127.0.0.1:8080")?
     .run()
