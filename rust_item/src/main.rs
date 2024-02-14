@@ -16,6 +16,7 @@ use serde::Deserialize;
 use std::env;
 use std::fs::File;
 use std::io::Write;
+use bcrypt::{DEFAULT_COST, hash,verify};
 
 // 连接池类型别名
 pub type DbPool = Pool<ConnectionManager<PgConnection>>;
@@ -24,6 +25,9 @@ pub type DbPool = Pool<ConnectionManager<PgConnection>>;
 pub struct Account {
     account: String,
     psd: String,
+}
+fn hash_password(password: &str) -> String {
+    hash(password, DEFAULT_COST).unwrap()
 }
 fn check_image() -> Result<String, Box<dyn std::error::Error>> {
     let mut label = -1;
@@ -96,12 +100,47 @@ async fn upload_image(mut payload: Multipart) -> Result<HttpResponse, Error> {
     let h = check_image().unwrap();
     Ok(HttpResponse::Ok().body(h))
 }
+
+#[post("/insert_user")]
+async fn insert_user(
+    user_data: web::Json<Account>,
+    pool: web::Data<DbPool>,
+) -> impl Responder {
+    let mut conn = pool.get().expect("couldn't get db connection from pool");
+    let user = NewStudent{
+        account:user_data.account.clone(),
+        psd:hash_password(&user_data.psd)
+    };
+
+    let result = web::block(move || {
+        // 检查用户名是否存在
+        match student
+            .filter(account.eq(&user_data.account)) // 这里用你用来判断唯一性的字段
+            .first::<Student>(&mut conn) {
+            Ok(_) => Err(diesel::result::Error::AlreadyInTransaction), // 用户已存在
+            Err(diesel::result::Error::NotFound) => {
+                // 用户不存在，我们可以尝试插入新用户
+                diesel::insert_into(student)
+                    .values(&user)
+                    .execute(&mut conn)
+            }
+            Err(e) => Err(e), // 其他错误
+        }
+    })
+    .await;
+
+    match result {
+        Ok(_) => HttpResponse::Ok().body("Account created"),
+        _ => HttpResponse::BadRequest().body("Account already exists/other Error"),
+    }
+}
+
 #[post("/update_psd")]
 async fn update_psd(a: web::Json<Account>, pool: web::Data<DbPool>) -> impl Responder {
     let mut conn = pool.get().expect("couldn't get db connection from pool");
     let result = web::block(move || {
         diesel::update(student.filter(account.eq(&a.account)))
-            .set(psd.eq(&a.psd))
+            .set(psd.eq(&hash_password(&a.psd)))
             .execute(&mut conn)
     })
     .await;
@@ -113,7 +152,7 @@ async fn update_psd(a: web::Json<Account>, pool: web::Data<DbPool>) -> impl Resp
     }
 }
 
-#[post["/account"]]
+#[post["/check_account"]]
 async fn check_account(a: web::Json<Account>, pool: web::Data<DbPool>) -> impl Responder {
     let mut conn = pool.get().expect("couldn't get db connection from pool");
     // 查询数据库，检查用户名和密码
@@ -123,7 +162,7 @@ async fn check_account(a: web::Json<Account>, pool: web::Data<DbPool>) -> impl R
         .expect("Error loading users");
 
     // 根据查询结果返回相应信息
-    if results.psd == a.psd {
+    if verify(&a.psd, &results.psd).unwrap() {
         return HttpResponse::Ok().body("Password correct");
     } else {
         return HttpResponse::BadRequest().body("Invalid password");
@@ -152,6 +191,7 @@ async fn main() -> std::io::Result<()> {
             .service(upload_image)
             .service(check_account)
             .service(update_psd)
+            .service(insert_user)
     })
     .bind("127.0.0.1:8080")?
     .run()

@@ -4,7 +4,7 @@ use diesel::Insertable;
 use diesel::Queryable;
 
 #[derive(Queryable, Insertable, AsChangeset)]
-#[table_name = "student"]
+#[diesel(table_name = student)]
 pub struct Student {
     pub id: i32,
     pub account: String,
@@ -12,7 +12,7 @@ pub struct Student {
 }
 
 #[derive(Insertable, Debug)]
-#[table_name = "student"]
+#[diesel(table_name = student)]
 pub struct NewStudent {
     pub account: String,
     pub psd: String,

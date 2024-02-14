@@ -19,3 +19,4 @@ serde_json = "1.0.113"
 tokio = "1.36.0"
 opencv = { version = "0.88.0", features = ["face"] }
 diesel = { version = "2.1.4", features = ["postgres","r2d2"] }
+bcrypt="0.15.0"
