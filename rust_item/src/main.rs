@@ -2,6 +2,7 @@ mod model;
 mod schema;
 use actix_multipart::Multipart;
 use actix_web::{post, web, App, Error, HttpResponse, HttpServer, Responder};
+use bcrypt::{hash, verify, DEFAULT_COST};
 use diesel::pg::PgConnection;
 use diesel::prelude::*;
 use diesel::r2d2;
@@ -16,7 +17,6 @@ use serde::Deserialize;
 use std::env;
 use std::fs::File;
 use std::io::Write;
-use bcrypt::{DEFAULT_COST, hash,verify};
 
 // 连接池类型别名
 pub type DbPool = Pool<ConnectionManager<PgConnection>>;
@@ -102,21 +102,19 @@ async fn upload_image(mut payload: Multipart) -> Result<HttpResponse, Error> {
 }
 
 #[post("/insert_user")]
-async fn insert_user(
-    user_data: web::Json<Account>,
-    pool: web::Data<DbPool>,
-) -> impl Responder {
+async fn insert_user(user_data: web::Json<Account>, pool: web::Data<DbPool>) -> impl Responder {
     let mut conn = pool.get().expect("couldn't get db connection from pool");
-    let user = NewStudent{
-        account:user_data.account.clone(),
-        psd:hash_password(&user_data.psd)
+    let user = NewStudent {
+        account: user_data.account.clone(),
+        psd: hash_password(&user_data.psd),
     };
 
     let result = web::block(move || {
         // 检查用户名是否存在
         match student
             .filter(account.eq(&user_data.account)) // 这里用你用来判断唯一性的字段
-            .first::<Student>(&mut conn) {
+            .first::<Student>(&mut conn)
+        {
             Ok(_) => Err(diesel::result::Error::AlreadyInTransaction), // 用户已存在
             Err(diesel::result::Error::NotFound) => {
                 // 用户不存在，我们可以尝试插入新用户
@@ -184,7 +182,7 @@ async fn delete_account(
             actix_web::error::ErrorInternalServerError(e)
         })?;
 
-    Ok(HttpResponse::Ok().finish())
+    Ok(HttpResponse::Ok().body("删除成功"))
 }
 
 #[actix_web::main]
