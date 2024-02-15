@@ -169,6 +169,24 @@ async fn check_account(a: web::Json<Account>, pool: web::Data<DbPool>) -> impl R
     }
 }
 
+#[post("delete_account")]
+async fn delete_account(
+    a: web::Json<Account>,
+    pool: web::Data<DbPool>,
+) -> Result<HttpResponse, Error> {
+    let mut conn = pool.get().expect("couldn't get db connection from pool");
+
+    // 执行删除操作
+    diesel::delete(student.filter(account.eq(&a.account)))
+        .execute(&mut conn)
+        .map_err(|e| {
+            // 确保在这里处理所有错误类型
+            actix_web::error::ErrorInternalServerError(e)
+        })?;
+
+    Ok(HttpResponse::Ok().finish())
+}
+
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
     // 载入.env文件中的环境变量
@@ -192,6 +210,7 @@ async fn main() -> std::io::Result<()> {
             .service(check_account)
             .service(update_psd)
             .service(insert_user)
+            .service(delete_account)
     })
     .bind("127.0.0.1:8080")?
     .run()
