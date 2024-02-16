@@ -168,21 +168,28 @@ async fn check_account(a: web::Json<Account>, pool: web::Data<DbPool>) -> impl R
 }
 
 #[post("delete_account")]
-async fn delete_account(
-    a: web::Json<Account>,
-    pool: web::Data<DbPool>,
-) -> Result<HttpResponse, Error> {
+async fn delete_account(a: web::Json<Account>, pool: web::Data<DbPool>) -> impl Responder {
     let mut conn = pool.get().expect("couldn't get db connection from pool");
 
     // 执行删除操作
-    diesel::delete(student.filter(account.eq(&a.account)))
-        .execute(&mut conn)
-        .map_err(|e| {
-            // 确保在这里处理所有错误类型
-            actix_web::error::ErrorInternalServerError(e)
-        })?;
+    match diesel::delete(student.filter(account.eq(&a.account))).execute(&mut conn) {
+        Ok(0) => HttpResponse::NotFound().body("Account not found"),
+        Ok(_) => {
+            let count: i64 = student
+                .count()
+                .get_result(&mut conn)
+                .expect("Error counting items");
+            let reset_sequence_sql =
+                format!("ALTER SEQUENCE student_id_seq RESTART WITH {};", count - 2);
 
-    Ok(HttpResponse::Ok().body("删除成功"))
+            // 执行SQL命令
+            let _ = diesel::sql_query(&reset_sequence_sql)
+                .execute(&mut conn)
+                .expect("Error executing reset sequence SQL");
+            HttpResponse::Ok().body("Account successfully deleted")
+        }
+        Err(_) => HttpResponse::InternalServerError().finish(),
+    }
 }
 
 #[actix_web::main]
