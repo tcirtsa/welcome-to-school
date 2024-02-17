@@ -5,15 +5,22 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
     <link href="../static/icon.ico" rel="icon" type="image/x-icon">
+    <link rel="stylesheet" type="text/css" href="../static/css/table.css">
 </head>
 <body>
     <p>Hello World</p>
+    <form action="#">
+      <label>搜索账号:
+        <input id="query_input">
+      </label>
+    <button id="query" type="button">搜索</button>
+    </form>
     <table id="data-table">
       <thead>
         <tr>
-          <th>account</th>
-          <th>password</th>
-          <th>points</th>
+          <th id="account">account</th>
+          <th id="psd">password</th>
+          <th id="points">points</th>
           <th>操作</th>
         </tr>
       </thead>

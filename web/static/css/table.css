@@ -1,0 +1,9 @@
+/* 添加到<head>区域或外部样式表文件 */
+table {
+    border-collapse: collapse; 
+    /* 使单元格之间的边框合并为一个单一边框 */
+}
+
+table, th, td {
+    border: 1px solid black; /* 定义边框样式 */
+}

@@ -132,6 +132,64 @@ async fn get_all_accounts(pool: web::Data<DbPool>) -> impl Responder {
     }
 }
 
+#[post("/query")]
+async fn query(pool: web::Data<DbPool>, a: web::Json<Account>) -> impl Responder {
+    let mut conn = pool.get().expect("couldn't get db connection from pool");
+
+    let results = student
+        .filter(account.eq(&a.account))
+        .load::<Student>(&mut conn);
+
+    match results {
+        Ok(data) => HttpResponse::Ok().json(data),
+        Err(_) => HttpResponse::NotFound().json("用户不存在"),
+    }
+}
+
+#[post("/sort")]
+async fn sort(pool: web::Data<DbPool>, a: web::Json<Account>) -> impl Responder {
+    let mut conn = pool.get().expect("couldn't get db connection from pool");
+    // 前端发送给后端的参数
+    let sort_column = a.account.as_str(); // 例子中使用 "name" 字段排序，可以是其他字段
+    let sort_direction = a.psd.as_str(); // 排序方向，可以是 "asc" 或 "desc"
+
+    match sort_column {
+        "account" => match sort_direction {
+            "true" => {
+                let results = student.order(account.asc()).load::<Student>(&mut conn);
+                match results {
+                    Ok(result) => HttpResponse::Ok().json(result),
+                    Err(_) => HttpResponse::InternalServerError().json("内部服务器错误"),
+                }
+            }
+            _ => {
+                let results = student.order(account.desc()).load::<Student>(&mut conn);
+                match results {
+                    Ok(result) => HttpResponse::Ok().json(result),
+                    Err(_) => HttpResponse::InternalServerError().json("内部服务器错误"),
+                }
+            }
+        },
+        "points" => match sort_column {
+            "true" => {
+                let results = student.order(points.asc()).load::<Student>(&mut conn);
+                match results {
+                    Ok(result) => HttpResponse::Ok().json(result),
+                    Err(_) => HttpResponse::InternalServerError().json("内部服务器错误"),
+                }
+            }
+            _ => {
+                let results = student.order(points.desc()).load::<Student>(&mut conn);
+                match results {
+                    Ok(result) => HttpResponse::Ok().json(result),
+                    Err(_) => HttpResponse::InternalServerError().json("内部服务器错误"),
+                }
+            }
+        },
+        _ => HttpResponse::BadRequest().json("无法进行排序"),
+    }
+}
+
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
     // 载入.env文件中的环境变量
@@ -190,6 +248,8 @@ async fn main() -> std::io::Result<()> {
             .service(insert_user)
             .service(delete_account)
             .service(get_all_accounts)
+            .service(query)
+            .service(sort)
     })
     .bind("127.0.0.1:8080")?
     .run()

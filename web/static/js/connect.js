@@ -170,3 +170,139 @@ document.addEventListener('DOMContentLoaded', fetchData);
 
 // 添加点击事件来手动刷新表格数据
 document.getElementById('refreshButton').addEventListener('click', fetchData);
+
+const query_account=document.querySelector("#query_input");
+const query_button=document.querySelector("#query");
+query_button.addEventListener('click',()=>{
+  fetch('http://localhost:8080/query',{
+        method: 'POST', // or 'PUT'
+  headers: {
+    'Content-Type': 'application/json',
+  },
+  body: JSON.stringify({account:query_account.value,psd:''}),
+      })
+          .then(response => response.json())
+          .then(data => {
+            const tableBody = document.getElementById('data-table').getElementsByTagName('tbody')[0];
+            tableBody.innerHTML = ''; // 清空现有表格内容
+    
+            data.forEach(row => {
+                const tr = document.createElement('tr');
+                
+                // 创建account单元格
+                const accountCell = document.createElement('td');
+                accountCell.innerText = row.account;
+                tr.appendChild(accountCell);
+                
+                // 创建psd单元格
+                const psdCell = document.createElement('td');
+                psdCell.innerText = row.psd;
+                psdCell.addEventListener('click', () => makeCellEditable(accountCell,psdCell)); // 点击变为编辑状态
+                tr.appendChild(psdCell);
+
+                // 创建points单元格
+                const pointsCell = document.createElement('td');
+                pointsCell.innerText = row.points;
+                tr.appendChild(pointsCell);
+
+                // 不可编辑的其他数据单元格...
+                const deleteCell = document.createElement('td');
+                const deleteButton = document.createElement('button');
+                deleteButton.textContent = '删除';
+                deleteButton.onclick = function() { deleteItem(row.account); };
+                deleteCell.appendChild(deleteButton);
+                tr.appendChild(deleteCell);
+
+                tableBody.appendChild(tr);
+            });
+        })
+        .catch(err => console.error('Error fetching data:', err));
+})
+
+const sort_account=document.querySelector("#account");
+const sort_points=document.querySelector("#points");
+let a='true';
+let p='true';
+function sort(e,b){
+  fetch('http://localhost:8080/sort',{
+        method: 'POST', // or 'PUT'
+  headers: {
+    'Content-Type': 'application/json',
+  },
+  body: JSON.stringify({account:e,psd:b}),
+      })
+          .then(response => response.json())
+          .then(data => {
+            const tableBody = document.getElementById('data-table').getElementsByTagName('tbody')[0];
+            tableBody.innerHTML = ''; // 清空现有表格内容
+    
+            data.forEach(row => {
+                const tr = document.createElement('tr');
+                
+                // 创建account单元格
+                const accountCell = document.createElement('td');
+                accountCell.innerText = row.account;
+                tr.appendChild(accountCell);
+                
+                // 创建psd单元格
+                const psdCell = document.createElement('td');
+                psdCell.innerText = row.psd;
+                psdCell.addEventListener('click', () => makeCellEditable(accountCell,psdCell)); // 点击变为编辑状态
+                tr.appendChild(psdCell);
+
+                // 创建points单元格
+                const pointsCell = document.createElement('td');
+                pointsCell.innerText = row.points;
+                tr.appendChild(pointsCell);
+
+                // 不可编辑的其他数据单元格...
+                const deleteCell = document.createElement('td');
+                const deleteButton = document.createElement('button');
+                deleteButton.textContent = '删除';
+                deleteButton.onclick = function() { deleteItem(row.account); };
+                deleteCell.appendChild(deleteButton);
+                tr.appendChild(deleteCell);
+
+                tableBody.appendChild(tr);
+            });
+            const tr = document.createElement('tr');
+            let a='';
+            let p='';
+                
+                // 创建account单元格
+                const accountCell = document.createElement('td');
+                const accountinput = document.createElement('input');
+                accountinput.innerText = '';
+                accountinput.onblur=function(event) {a = event.target.value;}
+                accountCell.appendChild(accountinput);
+                tr.appendChild(accountCell);
+                
+                // 创建psd单元格
+                const psdCell = document.createElement('td');
+                const psdinput = document.createElement('input');
+                psdinput.innerText = '';
+                psdinput.onblur=function(event) {p = event.target.value;}
+                psdCell.appendChild(psdinput)
+                tr.appendChild(psdCell);
+
+                // 创建points单元格
+                const pointsCell = document.createElement('td');
+                pointsCell.innerText = 0;
+                tr.appendChild(pointsCell);
+
+                // 不可编辑的其他数据单元格...
+                const insertCell = document.createElement('td');
+                const insertButton = document.createElement('button');
+                insertButton.textContent = '添加';
+                insertButton.onclick = function() { insert_user(a,p); };
+                insertCell.appendChild(insertButton);
+                tr.appendChild(insertCell);
+
+                tableBody.appendChild(tr);
+        })
+        .catch(err => console.error('Error fetching data:', err));
+        if(e==='account') a = b === 'true' ? 'false' : 'true';
+        else p = b === 'true' ? 'false' : 'true';
+}
+sort_account.onclick=function() {sort(sort_account.innerText,a)};
+sort_points.onclick=function() {sort(sort_points.innerText,p)};
