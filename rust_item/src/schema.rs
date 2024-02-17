@@ -5,5 +5,6 @@ diesel::table! {
         id -> Int4,
         account -> Varchar,
         psd -> Varchar,
+        points -> Int4,
     }
 }
