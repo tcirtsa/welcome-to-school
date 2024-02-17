@@ -1,4 +1,3 @@
-const insert_user=document.querySelector("#insert_user");
 function makeCellEditable(cell1,cell2) {
   const originalText = cell2.innerText; // 保存原始文本
   cell2.innerHTML = ''; // 清空单元格内容
@@ -24,6 +23,7 @@ function makeCellEditable(cell1,cell2) {
       .then((response) => response.json())
       .then((data) => {
         console.log('Success:', data);
+        fetchData();
       })
       .catch((error) => {
         console.error('Error:', error);
@@ -55,11 +55,6 @@ function fetchData() {
             data.forEach(row => {
                 const tr = document.createElement('tr');
                 
-                // 创建ID单元格
-                const idCell = document.createElement('td');
-                idCell.innerText = row.id;
-                tr.appendChild(idCell);
-                
                 // 创建account单元格
                 const accountCell = document.createElement('td');
                 accountCell.innerText = row.account;
@@ -77,9 +72,49 @@ function fetchData() {
                 tr.appendChild(pointsCell);
 
                 // 不可编辑的其他数据单元格...
+                const deleteCell = document.createElement('td');
+                const deleteButton = document.createElement('button');
+                deleteButton.textContent = '删除';
+                deleteButton.onclick = function() { deleteItem(row.account); };
+                deleteCell.appendChild(deleteButton);
+                tr.appendChild(deleteCell);
 
                 tableBody.appendChild(tr);
             });
+            const tr = document.createElement('tr');
+            let a='';
+            let p='';
+                
+                // 创建account单元格
+                const accountCell = document.createElement('td');
+                const accountinput = document.createElement('input');
+                accountinput.innerText = '';
+                accountinput.onblur=function(event) {a = event.target.value;}
+                accountCell.appendChild(accountinput);
+                tr.appendChild(accountCell);
+                
+                // 创建psd单元格
+                const psdCell = document.createElement('td');
+                const psdinput = document.createElement('input');
+                psdinput.innerText = '';
+                psdinput.onblur=function(event) {p = event.target.value;}
+                psdCell.appendChild(psdinput)
+                tr.appendChild(psdCell);
+
+                // 创建points单元格
+                const pointsCell = document.createElement('td');
+                pointsCell.innerText = 0;
+                tr.appendChild(pointsCell);
+
+                // 不可编辑的其他数据单元格...
+                const insertCell = document.createElement('td');
+                const insertButton = document.createElement('button');
+                insertButton.textContent = '添加';
+                insertButton.onclick = function() { insert_user(a,p); };
+                insertCell.appendChild(insertButton);
+                tr.appendChild(insertCell);
+
+                tableBody.appendChild(tr);
         })
         .catch(err => console.error('Error fetching data:', err));
   }
@@ -87,9 +122,9 @@ function fetchData() {
   // 加载数据
   loadData();
 }
-insert_user.addEventListener("click",()=>{
-  let url = 'http://localhost:8080/check_account';
-let data = { account:'1220204156',psd:'123456' };
+function insert_user(a,p){
+  let url = 'http://localhost:8080/insert_user';
+let data = { account:a,psd:p };
 fetch(url, {
   method: 'POST', // or 'PUT'
   headers: {
@@ -100,11 +135,35 @@ fetch(url, {
 .then((response) => response.json())
 .then((data) => {
   console.log('Success:', data);
+  fetchData();
 })
 .catch((error) => {
   console.error('Error:', error);
 });
+}
+
+function deleteItem(a) {
+  fetch('http://localhost:8080/delete_account', { 
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({account:a,psd:''}),
 })
+      .then(response => response.json())
+      .then(result => {
+          if (result) {
+              console.log('Success:', result);
+              // 删除成功，重新从服务器刷新数据
+              fetchData();
+          } else {
+              console.error('删除失败:', result);
+          }
+      })
+      .catch(error => {
+          console.error('请求错误:', error);
+      });
+}
 
 // 页面刚加载完毕时自动获取数据
 document.addEventListener('DOMContentLoaded', fetchData);

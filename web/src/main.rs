@@ -113,21 +113,7 @@ async fn delete_account(a: web::Json<Account>, pool: web::Data<DbPool>) -> impl 
     // 执行删除操作
     // 执行删除操作
     match diesel::delete(student.filter(account.eq(&a.account))).execute(&mut conn) {
-        Ok(0) => HttpResponse::NotFound().json("Account not found"),
-        Ok(_) => {
-            let count: i64 = student
-                .count()
-                .get_result(&mut conn)
-                .expect("Error counting items");
-            let reset_sequence_sql =
-                format!("ALTER SEQUENCE student_id_seq RESTART WITH {};", count - 2);
-
-            // 执行SQL命令
-            let _ = diesel::sql_query(&reset_sequence_sql)
-                .execute(&mut conn)
-                .expect("Error executing reset sequence SQL");
-            HttpResponse::Ok().json("Account successfully deleted")
-        }
+        Ok(_) => HttpResponse::Ok().json("Account successfully deleted"),
         Err(_) => HttpResponse::InternalServerError().finish(),
     }
 }
