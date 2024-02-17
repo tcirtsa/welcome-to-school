@@ -65,11 +65,16 @@ function fetchData() {
                 accountCell.innerText = row.account;
                 tr.appendChild(accountCell);
                 
-                // 创建可编辑的值单元格
+                // 创建psd单元格
                 const psdCell = document.createElement('td');
                 psdCell.innerText = row.psd;
                 psdCell.addEventListener('click', () => makeCellEditable(accountCell,psdCell)); // 点击变为编辑状态
                 tr.appendChild(psdCell);
+
+                // 创建points单元格
+                const pointsCell = document.createElement('td');
+                pointsCell.innerText = row.points;
+                tr.appendChild(pointsCell);
 
                 // 不可编辑的其他数据单元格...
 
