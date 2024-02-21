@@ -9,7 +9,7 @@ use serde::{Deserialize, Serialize};
 pub struct Student {
     pub account: String,
     pub psd: String, // 注意：实际生产中应使用哈希密码
-    pub points:i32,
+    pub points: i32,
 }
 
 #[derive(Insertable, Debug)]
@@ -17,4 +17,19 @@ pub struct Student {
 pub struct NewStudent {
     pub account: String,
     pub psd: String,
+}
+
+#[derive(Queryable, Insertable, AsChangeset, Serialize, Deserialize)]
+#[diesel(table_name = latlong)]
+pub struct Latlong {
+    pub id: i32,
+    pub longitude: String,
+    pub latitude: String,
+}
+
+#[derive(Insertable, Debug)]
+#[diesel(table_name = latlong)]
+pub struct NewLatlong {
+    pub longitude: String,
+    pub latitude: String,
 }

@@ -1,2 +1,2 @@
 [print_schema]
-filter = { only_tables = ["student"] }
+filter = { only_tables = ["student", "latlong"] }
