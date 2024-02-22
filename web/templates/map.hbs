@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta charset="utf-8">
-    <title>多行输入与地图联动示例</title>
+    <title>动态添加、删除、插入输入行</title>
     <link href="../static/icon.ico" rel="icon" type="image/x-icon">
     <script type="text/javascript" src="https://webapi.amap.com/maps?v=1.4.15&key=f4b0954e7374b232ec9b81691ba06728"></script>
     <style>
@@ -13,22 +13,15 @@
         .latlong-row {
             margin-bottom: 5px;
         }
+        .latlong-row button {
+            margin-right: 5px;
+        }
     </style>
 </head>
 <body>
+    <button onclick="addRowTop()">在顶部添加行</button>
     <div id="latlongRows">
-        <!-- 示例的几行输入框 -->
-        <div class="latlong-row" data-index="0">
-            <input type="text" class="longitude" placeholder="经度" readonly>
-            <input type="text" class="latitude" placeholder="纬度" readonly>
-            <button onclick="selectRow(0)">选择</button>
-        </div>
-        <div class="latlong-row" data-index="1">
-            <input type="text" class="longitude" placeholder="经度" readonly>
-            <input type="text" class="latitude" placeholder="纬度" readonly>
-            <button onclick="selectRow(1)">选择</button>
-        </div>
-        <!-- 更多行可以按需添加 -->
+        <!-- 动态插入行 -->
     </div>
     <div id="container"></div>
 
@@ -41,18 +34,70 @@
 
         var currentRowIndex = null; // 当前选中的行索引
 
-        // 更新当前选中行
-        function selectRow(index) {
-            currentRowIndex = index;
+        // 在顶部添加新行
+        function addRowTop() {
+            addRow(0);
         }
 
-        // 地图点击事件
+        // 在指定索引后添加新行
+        function addRow(index) {
+            var rowContainer = document.getElementById('latlongRows');
+            var newRow = document.createElement('div');
+            newRow.className = 'latlong-row';
+
+            newRow.innerHTML = `
+                <input type="text" class="longitude" placeholder="经度">
+                <input type="text" class="latitude" placeholder="纬度">
+                <button onclick="selectRow(this)">选择</button>
+                <button onclick="deleteRow(this.parentNode)">删除</button>
+                <button onclick="addRowBelow(this.parentNode)">添加行</button>
+            `;
+
+            if (index === 0) {
+                rowContainer.insertBefore(newRow, rowContainer.firstChild);
+            } else {
+                rowContainer.insertBefore(newRow, index.nextElementSibling);
+            }
+            updateRowIndices();
+        }
+
+        // 在当前行下添加新行
+        function addRowBelow(currentRow) {
+            var rowIndex = Array.from(currentRow.parentNode.children).indexOf(currentRow);
+            addRow(currentRow);
+            updateRowIndices();
+        }
+
+        // 更新行索引，以保证它们的连续性（如果需要索引）
+        function updateRowIndices() {
+            var rows = document.getElementById('latlongRows').getElementsByClassName('latlong-row');
+            Array.from(rows).forEach((row, index) => {
+                // 更新行的数据索引（如果需要使用到索引属性）
+            });
+        }
+
+        // 选择当前行
+        function selectRow(button) {
+            var rows = document.getElementsByClassName('latlong-row');
+            Array.from(rows).forEach(row => row.classList.remove('selected-row'));
+            var currentRow = button.parentNode;
+            currentRowIndex = Array.from(currentRow.parentNode.children).indexOf(currentRow);
+            currentRow.classList.add('selected-row');
+        }
+
+        // 删除当前行
+        function deleteRow(rowElement) {
+            var rowContainer = document.getElementById('latlongRows');
+            rowContainer.removeChild(rowElement);
+        }
+
+        // 监听地图点击事件，更新选中行的经纬度
         map.on('click', function(e) {
             if(currentRowIndex != null) {
-                var rows = document.getElementsByClassName('latlong-row');
+                var rows = document.getElementById('latlongRows').children;
                 var selectedRow = rows[currentRowIndex];
-                selectedRow.querySelector('.longitude').value = e.lnglat.getLng();
-                selectedRow.querySelector('.latitude').value = e.lnglat.getLat();
+                selectedRow.getElementsByClassName('longitude')[0].value = e.lnglat.getLng();
+                selectedRow.getElementsByClassName('latitude')[0].value = e.lnglat.getLat();
             }
         });
     </script>
