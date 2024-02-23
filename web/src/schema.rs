@@ -2,7 +2,7 @@
 
 diesel::table! {
     latlong (id) {
-        id -> Int4,
+        id -> Varchar,
         longitude -> Varchar,
         latitude -> Varchar,
     }

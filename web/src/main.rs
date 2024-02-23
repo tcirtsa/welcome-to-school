@@ -13,6 +13,7 @@ use dotenv::dotenv;
 use handlebars::Handlebars;
 use model::*;
 use schema::student::dsl::*;
+use schema::latlong::dsl::*;
 use serde::{Deserialize, Serialize};
 use std::env;
 use walkdir::WalkDir;
@@ -208,31 +209,27 @@ async fn get_all_map(pool: web::Data<DbPool>) -> impl Responder {
     }
 }
 
-#[post("updata_map")]
+#[post("/updata_map")]
 async fn updata_map(pool: web::Data<DbPool>, form: web::Json<FormData>)->impl Responder{
     let mut conn = pool.get().expect("couldn't get db connection from pool");
     
     // 清空表中的数据
     diesel::delete(latlong).execute(&mut conn).expect("Error deleting data");
     
-    let result = web::block(move || {
+    let _ = web::block(move || {
         for data in &form.data{
             let new_data=Latlong{
-                id:data.id;
-                longitude:data.longitude;
-                latitude:data.latitude;
-            }
-        }
-        diesel::insert_into(latlong)
+                id:data.id.clone(),
+                longitude:data.longitude.clone(),
+                latitude:data.latitude.clone(),
+            };
+            let _=diesel::insert_into(latlong)
                     .values(&new_data)
-                    .execute(&mut conn)
+                    .execute(&mut conn);
+        }
     })
     .await;
-
-    match result.unwrap() {
-        Ok(_) => HttpResponse::Ok().json("Updated successfully"),
-        Err(_) => HttpResponse::InternalServerError().finish(),
-    }
+    HttpResponse::Ok().json("Updated successfully")
 }
 
 #[actix_web::main]
@@ -295,6 +292,8 @@ async fn main() -> std::io::Result<()> {
             .service(get_all_accounts)
             .service(query)
             .service(sort)
+            .service(get_all_map)
+            .service(updata_map)
     })
     .bind("127.0.0.1:8080")?
     .run()

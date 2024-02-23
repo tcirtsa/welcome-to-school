@@ -22,7 +22,7 @@ pub struct NewStudent {
 #[derive(Queryable, Insertable, AsChangeset, Serialize, Deserialize)]
 #[diesel(table_name = latlong)]
 pub struct Latlong {
-    pub id: i32,
+    pub id: String,
     pub longitude: String,
     pub latitude: String,
 }
