@@ -26,10 +26,3 @@ pub struct Latlong {
     pub longitude: String,
     pub latitude: String,
 }
-
-#[derive(Insertable, Debug)]
-#[diesel(table_name = latlong)]
-pub struct NewLatlong {
-    pub longitude: String,
-    pub latitude: String,
-}

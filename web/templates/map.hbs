@@ -20,9 +20,10 @@
 </head>
 <body>
     <button onclick="addRowTop()">在顶部添加行</button>
-    <div id="latlongRows">
+    <form id="latlongRows">
         <!-- 动态插入行 -->
-    </div>
+    </form>
+    <button type="button" id="submit-button">提交数据</button>
     <div id="container"></div>
 
     <script>
@@ -45,13 +46,41 @@
             var newRow = document.createElement('div');
             newRow.className = 'latlong-row';
 
-            newRow.innerHTML = `
-                <input type="text" class="longitude" placeholder="经度">
-                <input type="text" class="latitude" placeholder="纬度">
-                <button onclick="selectRow(this)">选择</button>
-                <button onclick="deleteRow(this.parentNode)">删除</button>
-                <button onclick="addRowBelow(this.parentNode)">添加行</button>
-            `;
+            const id=document.createElement('input');
+            id.type='text';
+            id.className='id';
+            id.placeholder='id';
+            id.name='id';
+            newRow.appendChild(id);
+
+            const longitude=document.createElement('input');
+            longitude.type='text';
+            longitude.className='longitude';
+            longitude.placeholder='经度';
+            longitude.name='longitude';
+            newRow.appendChild(longitude);
+
+            const latitude=document.createElement('input');
+            latitude.type='text';
+            latitude.className='latitude';
+            latitude.placeholder='纬度';
+            latitude.name='latitude';
+            newRow.appendChild(latitude);
+
+            const select=document.createElement('button');
+            select.textContent='选择';
+            select.onclick=function(){selectRow(this);};
+            newRow.appendChild(select);
+
+            const deletes=document.createElement('button');
+            deletes.textContent='删除';
+            deletes.onclick=function(){deleteRow(this.parentNode);};
+            newRow.appendChild(deletes);
+
+            const add=document.createElement('button');
+            add.textContent='添加';
+            add.onclick=function(){addRowBelow(this.parentNode);};
+            newRow.appendChild(add);
 
             if (index === 0) {
                 rowContainer.insertBefore(newRow, rowContainer.firstChild);
@@ -99,6 +128,33 @@
                 selectedRow.getElementsByClassName('longitude')[0].value = e.lnglat.getLng();
                 selectedRow.getElementsByClassName('latitude')[0].value = e.lnglat.getLat();
             }
+        });
+        document.getElementById('submit-button').addEventListener('click', function() {
+            const inputGroups = document.querySelectorAll('.latlong-row');
+            let dataList = [];
+
+            inputGroups.forEach(group => {
+                let dataObject = {};
+                group.querySelectorAll('input').forEach(input => {
+                    dataObject[input.name] = input.value;
+                });
+                dataList.push(dataObject);
+            });
+
+            fetch('/update-database', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(dataList)
+            })
+            .then(response => response.json())
+            .then(data => {
+                // 对响应做进一步处理
+            })
+            .catch((error) => {
+                // 处理错误
+            });
         });
     </script>
 </body>

@@ -20,6 +20,11 @@ use walkdir::WalkDir;
 // 连接池类型别名
 pub type DbPool = Pool<ConnectionManager<PgConnection>>;
 
+#[derive(Deserialize)]
+struct FormData {
+    data: Vec<Latlong>
+}
+
 #[derive(Serialize)]
 struct Welcome {
     name: String,
@@ -187,6 +192,46 @@ async fn sort(pool: web::Data<DbPool>, a: web::Json<Account>) -> impl Responder 
             }
         },
         _ => HttpResponse::BadRequest().json("无法进行排序"),
+    }
+}
+
+#[post("/get_all_map")]
+async fn get_all_map(pool: web::Data<DbPool>) -> impl Responder {
+    let mut conn = pool.get().expect("couldn't get db connection from pool");
+
+    // 使用前面定义的函数来获取所有账户
+    let data_result = latlong.load::<Latlong>(&mut conn); // 根据你的数据库结构调整
+
+    match data_result {
+        Ok(data) => HttpResponse::Ok().json(data), // 发送JSON响应
+        Err(_) => HttpResponse::InternalServerError().into(),
+    }
+}
+
+#[post("updata_map")]
+async fn updata_map(pool: web::Data<DbPool>, form: web::Json<FormData>)->impl Responder{
+    let mut conn = pool.get().expect("couldn't get db connection from pool");
+    
+    // 清空表中的数据
+    diesel::delete(latlong).execute(&mut conn).expect("Error deleting data");
+    
+    let result = web::block(move || {
+        for data in &form.data{
+            let new_data=Latlong{
+                id:data.id;
+                longitude:data.longitude;
+                latitude:data.latitude;
+            }
+        }
+        diesel::insert_into(latlong)
+                    .values(&new_data)
+                    .execute(&mut conn)
+    })
+    .await;
+
+    match result.unwrap() {
+        Ok(_) => HttpResponse::Ok().json("Updated successfully"),
+        Err(_) => HttpResponse::InternalServerError().finish(),
     }
 }
 
