@@ -25,13 +25,15 @@ document.getElementById('add-top').addEventListener('click', function() {
 // 提交数据按钮
 document.getElementById('submit-data').addEventListener('click', function() {
     const table = document.getElementById('data-table');
-    const rows = table.querySelectorAll('tr');
-    const data = Array.from(rows).slice(1).map(row => {
-        return {
+    const rows = table.querySelectorAll('.input_row');
+    const data=[];
+    rows.forEach((row)=>{
+        const rowData={
             id: row.querySelector('.id-input').value,
             longitude: row.querySelector('.longitude-input').value,
             latitude: row.querySelector('.latitude-input').value
-        };
+        }
+        data.push(rowData);
     });
 
     // 使用AJAX发送数据到服务器
@@ -71,6 +73,7 @@ function loadData() {
 // 创建一个新的表格行
 function createDataRow(data = { id: '', longitude: '', latitude: '' }) {
     const row = document.createElement('tr');
+    row.className='input_row';
 
     row.innerHTML = `
         <td><input type="text" class="id-input" value="${data.id}"/></td>

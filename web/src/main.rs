@@ -12,19 +12,14 @@ use diesel::{
 use dotenv::dotenv;
 use handlebars::Handlebars;
 use model::*;
-use schema::student::dsl::*;
 use schema::latlong::dsl::*;
+use schema::student::dsl::*;
 use serde::{Deserialize, Serialize};
 use std::env;
 use walkdir::WalkDir;
 
 // 连接池类型别名
 pub type DbPool = Pool<ConnectionManager<PgConnection>>;
-
-#[derive(Deserialize)]
-struct FormData {
-    data: Vec<Latlong>
-}
 
 #[derive(Serialize)]
 struct Welcome {
@@ -210,26 +205,43 @@ async fn get_all_map(pool: web::Data<DbPool>) -> impl Responder {
 }
 
 #[post("/updata_map")]
-async fn updata_map(pool: web::Data<DbPool>, form: web::Json<FormData>)->impl Responder{
+async fn updata_map(pool: web::Data<DbPool>, data: web::Json<Vec<Latlong>>) -> impl Responder {
     let mut conn = pool.get().expect("couldn't get db connection from pool");
-    
-    // 清空表中的数据
-    diesel::delete(latlong).execute(&mut conn).expect("Error deleting data");
-    
-    let _ = web::block(move || {
-        for data in &form.data{
-            let new_data=Latlong{
-                id:data.id.clone(),
-                longitude:data.longitude.clone(),
-                latitude:data.latitude.clone(),
+
+    // 进行数据库事务
+    let result = conn.transaction::<_, diesel::result::Error, _>(|conn| {
+        // 首先清空整个表（假设表名为`locations`）
+        diesel::delete(latlong).execute(conn)?;
+
+        // 接着插入新数据
+        for location in data.into_inner() {
+            let new_location = Latlong {
+                id: location.id.clone(),
+                longitude: location.longitude,
+                latitude: location.latitude,
             };
-            let _=diesel::insert_into(latlong)
-                    .values(&new_data)
-                    .execute(&mut conn);
+            print!("{}",location.id);
+
+            // 使用Diesel执行插入操作
+            diesel::insert_into(latlong)
+                .values(&new_location)
+                .execute(conn)?;
         }
-    })
-    .await;
-    HttpResponse::Ok().json("Updated successfully")
+
+        Ok(())
+    });
+
+    match result {
+        Ok(_) => {
+            // 返回成功响应
+            HttpResponse::Ok().json("Data reset complete")
+        }
+        Err(e) => {
+            eprintln!("Database transaction failed: {}", e);
+            // 返回错误响应，这里需要根据实际情况来设置错误的HTTP状态码
+            HttpResponse::InternalServerError().json("Internal Server Error")
+        }
+    }
 }
 
 #[actix_web::main]
