@@ -286,7 +286,7 @@ async fn main() -> std::io::Result<()> {
 
     HttpServer::new(move || {
         let cors = Cors::default()
-            .allowed_origin("http://127.0.0.1:7878")
+            .allowed_origin("http://127.0.0.1:8080")
             .allow_any_method()
             .allow_any_header()
             .max_age(3600);
@@ -306,7 +306,7 @@ async fn main() -> std::io::Result<()> {
             .service(get_all_map)
             .service(updata_map)
     })
-    .bind("127.0.0.1:7878")?
+    .bind("127.0.0.1:")?
     .run()
     .await
 }
