@@ -2,8 +2,9 @@ use crate::schema::*;
 use diesel::prelude::*;
 use diesel::Insertable;
 use diesel::Queryable;
+use serde::{Deserialize, Serialize};
 
-#[derive(Queryable, Insertable, AsChangeset)]
+#[derive(Queryable, Insertable, AsChangeset, Serialize, Deserialize)]
 #[diesel(table_name = student)]
 pub struct Student {
     pub account: String,
@@ -16,4 +17,12 @@ pub struct Student {
 pub struct NewStudent {
     pub account: String,
     pub psd: String,
+}
+
+#[derive(Queryable, Insertable, AsChangeset, Serialize, Deserialize, Debug)]
+#[diesel(table_name = latlong)]
+pub struct Latlong {
+    pub id: String,
+    pub longitude: String,
+    pub latitude: String,
 }

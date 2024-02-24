@@ -18,7 +18,7 @@ function makeCellEditable(cell1,cell2) {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({account:cell1.innerText,psd:originalText}),
+        body: JSON.stringify({account:cell1.innerText,psd:newText}),
       })
       .then((response) => response.json())
       .then((data) => {
