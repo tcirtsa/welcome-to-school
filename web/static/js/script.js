@@ -20,14 +20,15 @@ document.getElementById('add-top').addEventListener('click', function() {
     const table = document.getElementById('data-table');
     const row = createDataRow();
     table.insertAdjacentElement('afterend', row);
+    table.appendChild(row);
 });
 
 // 提交数据按钮
 document.getElementById('submit-data').addEventListener('click', function() {
-    const table = document.getElementById('data-table');
-    const rows = table.querySelectorAll('.input_row');
+    const table = document.querySelector('#data-table');
+    const rows = table.querySelectorAll('.input-row');
     const data=[];
-    rows.forEach((row)=>{
+    rows.forEach(row=>{
         const rowData={
             id: row.querySelector('.id-input').value,
             longitude: row.querySelector('.longitude-input').value,
@@ -46,6 +47,7 @@ document.getElementById('submit-data').addEventListener('click', function() {
     }).then(response => {
         return response.json();
     }).then(result => {
+        console.log(data);
         console.log('Data submitted successfully:', result);
     }).catch(error => {
         console.error('Error submitting data:', error);
@@ -72,18 +74,17 @@ function loadData() {
 
 // 创建一个新的表格行
 function createDataRow(data = { id: '', longitude: '', latitude: '' }) {
+    const table = document.querySelector('#data-table');
     const row = document.createElement('tr');
-    row.className='input_row';
+    row.className='input-row';
 
     row.innerHTML = `
         <td><input type="text" class="id-input" value="${data.id}"/></td>
         <td><input type="text" class="longitude-input" value="${data.longitude}"/></td>
         <td><input type="text" class="latitude-input" value="${data.latitude}"/></td>
         <td><button class="select-row">选择</button></td>
-        <td>
-            <button class="delete-row">删除</button>
-            <button class="add-row-below">添加行</button>
-        </td>
+        <td><button class="delete-row">删除</button></td>
+        <td><button class="add-row-below">添加行</button></td>
     `;
 
     // 选择行按钮
@@ -110,8 +111,8 @@ function createDataRow(data = { id: '', longitude: '', latitude: '' }) {
     addRowBelowBtn.addEventListener('click', function() {
         const newRow = createDataRow();
         row.parentNode.insertBefore(newRow, row.nextSibling);
+        table.append(newRow);
     });
-
     return row;
 }
 

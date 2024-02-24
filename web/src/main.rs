@@ -216,11 +216,10 @@ async fn updata_map(pool: web::Data<DbPool>, data: web::Json<Vec<Latlong>>) -> i
         // 接着插入新数据
         for location in data.into_inner() {
             let new_location = Latlong {
-                id: location.id.clone(),
+                id: location.id,
                 longitude: location.longitude,
                 latitude: location.latitude,
             };
-            print!("{}",location.id);
 
             // 使用Diesel执行插入操作
             diesel::insert_into(latlong)
@@ -287,7 +286,7 @@ async fn main() -> std::io::Result<()> {
 
     HttpServer::new(move || {
         let cors = Cors::default()
-            .allowed_origin("http://127.0.0.1:8080")
+            .allowed_origin("http://127.0.0.1:7878")
             .allow_any_method()
             .allow_any_header()
             .max_age(3600);
@@ -307,7 +306,7 @@ async fn main() -> std::io::Result<()> {
             .service(get_all_map)
             .service(updata_map)
     })
-    .bind("127.0.0.1:8080")?
+    .bind("127.0.0.1:7878")?
     .run()
     .await
 }
