@@ -306,7 +306,7 @@ async fn main() -> std::io::Result<()> {
             .service(get_all_map)
             .service(updata_map)
     })
-    .bind("127.0.0.1:")?
+    .bind("127.0.0.1:8080")?
     .run()
     .await
 }
