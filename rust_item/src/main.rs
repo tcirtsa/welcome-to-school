@@ -12,6 +12,7 @@ use model::*;
 use opencv::core::{FileStorage, Mat};
 use opencv::{core, face, imgcodecs, imgproc, objdetect, prelude::*, types};
 use r2d2::{ConnectionManager, Pool};
+use schema::latlong::dsl::*;
 use schema::student::dsl::*;
 use serde::Deserialize;
 use std::env;
@@ -26,6 +27,61 @@ pub struct Account {
     account: String,
     psd: String,
 }
+fn direction(a: (f64, f64), b: (f64, f64)) -> String {
+    let line_start = (a.0, a.1);
+    let line_end = (b.0, b.1);
+
+    let dx = line_end.0 - line_start.0;
+    let dy = line_end.1 - line_start.1;
+
+    let tan = dy / dx;
+    let tan22_5 = 0.01370864;
+    let tan67_5 = 0.02285028;
+    if tan < tan22_5 && tan > -tan22_5 && dx > 0f64 {
+        String::from("东")
+    } else if tan > tan22_5 && tan < tan67_5 && dx > 0f64 {
+        String::from("东北")
+    } else if (tan > tan67_5 && dx > 0f64) || (tan < -tan67_5 && dx < 0f64) {
+        String::from("北")
+    } else if tan > -tan67_5 && tan < -tan22_5 && dx < 0f64 {
+        String::from("西北")
+    } else if tan < tan22_5 && tan > -tan22_5 && dx < 0f64 {
+        String::from("西")
+    } else if tan > tan22_5 && tan < tan67_5 && dx < 0f64 {
+        String::from("西南")
+    } else if (tan > tan67_5 && dx < 0f64) || (tan < -tan67_5 && dx > 0f64) {
+        String::from("南")
+    } else {
+        String::from("东南")
+    }
+}
+fn point_near_line_segment(p: (f64, f64), a: (f64, f64), b: (f64, f64), range: f64) -> bool {
+    let point = (p.0, p.1);
+    let line_start = (a.0, a.1);
+    let line_end = (b.0, b.1);
+
+    let dx = line_end.0 - line_start.0;
+    let dy = line_end.1 - line_start.1;
+
+    // 线段长度的平方
+    let l2 = dx.powi(2) + dy.powi(2);
+
+    // 如果线段是一个点，则返回该点距离判断点的距离
+    if l2 == 0.0 {
+        return (point.0 - line_start.0).hypot(point.1 - line_start.1) < range;
+    }
+
+    // 计算投影点在线段上的比例 t
+    let t = ((point.0 - line_start.0) * dx + (point.1 - line_start.1) * dy) / l2;
+    let t = t.max(0.0).min(1.0); // 防止投影点超出线段范围，即限制t在0和1之间
+
+    // 投影点坐标
+    let projection = (line_start.0 + t * dx, line_start.1 + t * dy);
+
+    // 判断点到投影点（在线段上）的距离是否小于指定的范围
+    (point.0 - projection.0).hypot(point.1 - projection.1) < range
+}
+
 fn hash_password(password: &str) -> String {
     hash(password, DEFAULT_COST).unwrap()
 }
@@ -192,6 +248,51 @@ async fn delete_account(a: web::Json<Account>, pool: web::Data<DbPool>) -> impl 
     }
 }
 
+#[post("/how_to_go")]
+async fn how_to_go(pool: web::Data<DbPool>, a: web::Json<Latlong>) -> impl Responder {
+    let mut conn = pool.get().expect("couldn't get db connection from pool");
+
+    let count = latlong
+        .count()
+        .get_result::<i64>(&mut *conn) // 注意： &*conn是为了解引用PooledConnection然后又借用
+        .expect("Error loading user count");
+
+    let results: Vec<Latlong> = latlong
+        .order(id.asc())
+        .load::<Latlong>(&mut conn)
+        .expect("Error loading users");
+
+    let mut h = 0;
+    let mut i = 0;
+    let mut s = String::new();
+    while h < count - 1 {
+        let point = (
+            a.longitude.parse::<f64>().unwrap(),
+            a.latitude.parse::<f64>().unwrap(),
+        );
+        let start = (
+            results[i].longitude.parse::<f64>().unwrap(),
+            results[i].latitude.parse::<f64>().unwrap(),
+        );
+        let end = (
+            results[i + 1].longitude.parse::<f64>().unwrap(),
+            results[i + 1].latitude.parse::<f64>().unwrap(),
+        );
+        if point_near_line_segment(point, start, end, 0.00004358f64) {
+            s = direction(start, end);
+            break;
+        } else {
+            i += 1;
+            h += 1;
+        }
+    }
+    if h != count - 1 {
+        return HttpResponse::Ok().json(s);
+    } else {
+        return HttpResponse::BadRequest().finish();
+    }
+}
+
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
     // 载入.env文件中的环境变量
@@ -216,6 +317,7 @@ async fn main() -> std::io::Result<()> {
             .service(update_psd)
             .service(insert_user)
             .service(delete_account)
+            .service(how_to_go)
     })
     .bind("127.0.0.1:7878")?
     .run()
