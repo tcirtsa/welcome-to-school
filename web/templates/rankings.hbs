@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Points</title>
+    <link href="../static/icon.ico" rel="icon" type="image/x-icon">
+<style>
+    .progress-bar-container {
+        width: 100%;
+        background-color: #ddd;
+    }
+
+    .progress-bar {
+        height: 20px;
+        background-color: #4CAF50;
+        text-align: center;
+        line-height: 20px;
+        color: white;
+    }
+</style>
+</head>
+<body>
+<h1>User Points</h1>
+<div id="users-container"></div>
+
+<script>
+function createProgressBar(points) {
+    // 创建进度条
+    const progressBar = document.createElement('div');
+    progressBar.classList.add('progress-bar');
+    progressBar.style.width = `${points}%`; // 设置进度条宽度为points的值
+    progressBar.textContent = points; // 显示分数在进度条内
+    return progressBar;
+}
+
+function displayUser(account, points) {
+    const usersContainer = document.getElementById('users-container');
+
+    // 创建账户名元素
+    const accountElement = document.createElement('div');
+    accountElement.textContent = `Account: ${account}`;
+
+    // 创建进度条容器
+    const progressBarContainer = document.createElement('div');
+    progressBarContainer.classList.add('progress-bar-container');
+    progressBarContainer.appendChild(createProgressBar(points));
+
+    // 将账户名和进度条添加到我们的容器中
+    usersContainer.appendChild(accountElement);
+    usersContainer.appendChild(progressBarContainer);
+}
+
+function fetchUsers() {
+    fetch('http://localhost:8080/get_rank',{
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+    }) // 此URL需要根据您的实际API端点进行更改
+        .then(response => {
+            if (!response.ok) throw new Error('Network response was not ok');
+            return response.json(); // 解析JSON数据
+        })
+        .then(users => {
+            const usersContainer = document.getElementById('users-container');
+            usersContainer.innerHTML='';
+            users.forEach(user => {
+                displayUser(user.account, user.points);
+            });
+            const refreshButton = document.createElement('button');
+            refreshButton.textContent='刷新数据';
+            refreshButton.onclick=function(){fetchUsers();};
+            usersContainer.appendChild(refreshButton);
+        })
+        .catch(error => {
+            console.error('There has been a problem with your fetch operation:', error);
+        });
+}
+
+document.addEventListener('DOMContentLoaded', fetchUsers); // 页面加载完成后获取数据
+</script>
+
+</body>
+</html>

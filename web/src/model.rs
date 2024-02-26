@@ -19,6 +19,13 @@ pub struct NewStudent {
     pub psd: String,
 }
 
+#[derive(Queryable, Insertable, AsChangeset, Serialize, Deserialize)]
+#[diesel(table_name = student)]
+pub struct Points {
+    pub account: String,
+    pub points: i32,
+}
+
 #[derive(Queryable, Insertable, AsChangeset, Serialize, Deserialize, Debug)]
 #[diesel(table_name = latlong)]
 pub struct Latlong {

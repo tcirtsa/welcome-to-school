@@ -2,7 +2,11 @@ mod model;
 mod schema;
 use actix_cors::Cors;
 use actix_files as files;
-use actix_web::{get, post, web, App, HttpResponse, HttpServer, Responder};
+use actix_web::{
+    get, post,
+    web::{self},
+    App, HttpResponse, HttpServer, Responder,
+};
 use bcrypt::{hash, DEFAULT_COST};
 use diesel::{
     pg::PgConnection,
@@ -191,6 +195,22 @@ async fn sort(pool: web::Data<DbPool>, a: web::Json<Account>) -> impl Responder 
     }
 }
 
+#[post("/get_rank")]
+async fn get_rank(pool: web::Data<DbPool>) -> impl Responder {
+    let mut conn = pool.get().expect("couldn't get db connection from pool");
+
+    // 查询用户数据并按points降序排序
+    let user_data = student
+        .select((account, points))
+        .order(points.desc()) // 应用降序排序
+        .load::<Points>(&mut* conn);
+
+    match user_data {
+        Ok(result) => HttpResponse::Ok().json(result),
+        Err(_) => HttpResponse::InternalServerError().json("内部服务器错误"),
+    }
+}
+
 #[post("/get_all_map")]
 async fn get_all_map(pool: web::Data<DbPool>) -> impl Responder {
     let mut conn = pool.get().expect("couldn't get db connection from pool");
@@ -305,6 +325,7 @@ async fn main() -> std::io::Result<()> {
             .service(sort)
             .service(get_all_map)
             .service(updata_map)
+            .service(get_rank)
     })
     .bind("127.0.0.1:8080")?
     .run()
