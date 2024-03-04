@@ -18,6 +18,9 @@ use serde::Deserialize;
 use std::env;
 use std::fs::File;
 use std::io::Write;
+use qrcode::QrCode;
+use image::{Luma,ImageBuffer};
+use std::io::Cursor;
 
 // 连接池类型别名
 pub type DbPool = Pool<ConnectionManager<PgConnection>>;
@@ -293,6 +296,14 @@ async fn how_to_go(pool: web::Data<DbPool>, a: web::Json<Latlong>) -> impl Respo
     }
 }
 
+#[post("/generate_qr")]
+async fn generate_qr(a: web::Json<Account>) -> impl Responder {
+    let code=QrCode::new(&a.account).unwrap();
+    let image:ImageBuffer<Luma<u8>,Vec<u8>>=code.render::<Luma<u8>>().build();
+    let mut buffer=Cursor::new(vec![]);
+    image::codecs::jpeg::JpegEncoder::new(&mut buffer).encode(&image,image.width(),image.height(),image::ColorType::L8).unwrap();
+    HttpResponse::Ok().content_type("image/jpeg").body(buffer.into_inner())
+}
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
     // 载入.env文件中的环境变量
@@ -318,6 +329,7 @@ async fn main() -> std::io::Result<()> {
             .service(insert_user)
             .service(delete_account)
             .service(how_to_go)
+            .service(generate_qr)
     })
     .bind("127.0.0.1:7878")?
     .run()
