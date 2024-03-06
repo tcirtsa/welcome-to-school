@@ -8,19 +8,21 @@ use diesel::prelude::*;
 use diesel::r2d2;
 use dotenv::dotenv;
 use futures::{StreamExt, TryStreamExt};
+use image::ImageEncoder;
+use image::{ImageBuffer, Luma};
 use model::*;
 use opencv::core::{FileStorage, Mat};
 use opencv::{core, face, imgcodecs, imgproc, objdetect, prelude::*, types};
+use qrcode::QrCode;
 use r2d2::{ConnectionManager, Pool};
 use schema::latlong::dsl::*;
 use schema::student::dsl::*;
 use serde::Deserialize;
 use std::env;
 use std::fs::File;
-use std::io::Write;
-use qrcode::QrCode;
-use image::{Luma,ImageBuffer};
 use std::io::Cursor;
+use std::io::Write;
+use std::path::Path;
 
 // 连接池类型别名
 pub type DbPool = Pool<ConnectionManager<PgConnection>>;
@@ -296,13 +298,25 @@ async fn how_to_go(pool: web::Data<DbPool>, a: web::Json<Latlong>) -> impl Respo
     }
 }
 
+fn save_qr_code(buffer: Vec<u8>) -> std::io::Result<()> {
+    let path = Path::new("qr_code.png");
+    let mut file = File::create(path)?;
+    file.write_all(&buffer)?;
+    Ok(())
+}
+
 #[post("/generate_qr")]
 async fn generate_qr(a: web::Json<Account>) -> impl Responder {
-    let code=QrCode::new(&a.account).unwrap();
-    let image:ImageBuffer<Luma<u8>,Vec<u8>>=code.render::<Luma<u8>>().build();
-    let mut buffer=Cursor::new(vec![]);
-    image::codecs::jpeg::JpegEncoder::new(&mut buffer).encode(&image,image.width(),image.height(),image::ColorType::L8).unwrap();
-    HttpResponse::Ok().content_type("image/jpeg").body(buffer.into_inner())
+    let code = QrCode::new(&a.account).unwrap();
+    let image: ImageBuffer<Luma<u8>, Vec<u8>> = code.render::<Luma<u8>>().build();
+    let mut buffer = Cursor::new(vec![]);
+    image::codecs::png::PngEncoder::new(&mut buffer)
+        .write_image(&image, image.width(), image.height(), image::ColorType::L8)
+        .unwrap();
+    save_qr_code(buffer.get_ref().to_vec()).unwrap();
+    HttpResponse::Ok()
+        .content_type("image/png")
+        .body(buffer.into_inner())
 }
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
