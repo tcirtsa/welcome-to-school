@@ -203,7 +203,7 @@ async fn get_rank(pool: web::Data<DbPool>) -> impl Responder {
     let user_data = student
         .select((account, points))
         .order(points.desc()) // 应用降序排序
-        .load::<Points>(&mut* conn);
+        .load::<Points>(&mut *conn);
 
     match user_data {
         Ok(result) => HttpResponse::Ok().json(result),

@@ -1,0 +1,55 @@
+# 开发环境配置
+springdoc:
+  paths-to-match: /api/**
+  swagger-ui:
+    operations-sorter: alpha
+spring:
+  mail:
+    host: smtp.163.com
+    username: heidan20231@163.com
+    password: UKCVZLFDJMEZLPFT
+    port: 465
+    properties:
+      mail:
+        smtp:
+          auth: true
+          ssl:
+            enable: true
+          starttls:
+            enable: true
+            required: true
+          socketFactory:
+            port: 465
+            class: javax.net.ssl.SSLSocketFactory
+    protocol: smtp
+  datasource:
+    url: jdbc:mysql://localhost:3306/wall
+    username: root
+    password: j5ln6n4h
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  security:
+    jwt:
+      key: asfafs
+      expire: 72
+      limit:
+        base: 10
+        upgrade: 300
+        frequency: 30
+    filter:
+      order: -100
+  web:
+    verify:
+      mail-limit: 60
+    flow:
+      period: 3
+      limit: 50
+      block: 30
+    cors:
+      origin: '*'
+      credentials: false
+      methods: '*'
+  minio:
+    endpoint: http://localhost:9000
+    username: minio
+    password: password
+
